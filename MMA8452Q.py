@@ -68,6 +68,7 @@ class MMA8452Q():
         Status register, X-Axis MSB, X-Axis LSB, Y-Axis MSB, Y-Axis LSB, Z-Axis MSB, Z-Axis LSB"""
         data = bus.read_i2c_block_data(MMA8452Q_DEFAULT_ADDRESS, MMA8452Q_REG_STATUS, 7)
 # Convert the data
+        """
         xAccl = (data[1] * 256 + data[2]) / 16
         if xAccl > 2047 :
             xAccl -= 4096
@@ -77,5 +78,23 @@ class MMA8452Q():
         zAccl = (data[5] * 256 + data[6]) / 16
         if zAccl > 2047 :
             zAccl -= 4096
-        return {'x' : xAccl, 'y' : yAccl, 'z' : zAccl}
+        """
+        print("raw: {}".format(data))
+        x = data[1] << 8 | data[2] >> 2
+        y = data[3] << 8 | data[4] >> 2
+        z = data[5] << 8 | data[6] >> 2
+        print("less raw: {}, {}, {}".format(x, y, z))
+        precision = 14 # (14 would be hi rez mode)
+        max_val = 2 ** (precision - 1) - 1
+        signed_max = 2 ** precision
+        x -= signed_max if x > max_val else 0
+        y -= signed_max if y > max_val else 0
+        z -= signed_max if z > max_val else 0
+        earth_gravity = 9.80665
+        range_4g = 2048 / earth_gravity
+        x = round((float(x)) / range_4g, 3)
+        y = round((float(y)) / range_4g, 3)
+        z = round((float(z)) / range_4g, 3)
+
+        return {'x' : x, 'y' : y, 'z' : z}
  

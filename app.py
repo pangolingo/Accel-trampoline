@@ -68,6 +68,7 @@ while True :
             current_color = 0
     elif g_force <= 1200:
         signaled = False
+        colorAll(strip, Color(0,0,0))
     #print(" ************************************* ")
     # file_handle.write("{}\t{}\t{}\t{}\n".format(i, accl['x'], accl['x'], accl['x']))
     # i = i + 1
